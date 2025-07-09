@@ -1,0 +1,108 @@
+// src/utils/apiUtils.ts
+import { API_CONFIG } from "./constants";
+
+/**
+ * Validates search term before making API call
+ */
+export const validateSearchTerm = (searchTerm: string): boolean => {
+  return searchTerm.trim().length >= 2;
+};
+
+/**
+ * Sanitizes search term for API call
+ */
+export const sanitizeSearchTerm = (searchTerm: string): string => {
+  return searchTerm.trim().replace(/[^\w\s-]/gi, "");
+};
+
+/**
+ * Gets the full poster URL or returns default
+ */
+export const getPosterUrl = (posterPath: string): string => {
+  if (!posterPath || posterPath === "N/A") {
+    return API_CONFIG.DEFAULT_POSTER;
+  }
+
+  // If it's already a full URL, return as is
+  if (posterPath.startsWith("http")) {
+    return posterPath;
+  }
+
+  // Otherwise, construct the full URL
+  return `${API_CONFIG.POSTER_URL}/?apikey=${API_CONFIG.API_KEY}&i=${posterPath}`;
+};
+
+/**
+ * Handles API rate limiting with exponential backoff
+ */
+export const withRetry = async <T>(
+  apiCall: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> => {
+  let lastError: Error;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await apiCall();
+    } catch (error) {
+      lastError = error as Error;
+
+      // Don't retry on client errors (4xx)
+      if (
+        lastError.message.includes("400") ||
+        lastError.message.includes("401")
+      ) {
+        throw lastError;
+      }
+
+      // If this was the last attempt, throw the error
+      if (attempt === maxRetries) {
+        throw lastError;
+      }
+
+      // Calculate delay with exponential backoff
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(
+        `API call failed, retrying in ${delay}ms (attempt ${
+          attempt + 1
+        }/${maxRetries})`
+      );
+
+      // Wait before retrying
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError!;
+};
+
+/**
+ * Checks if error is network-related
+ */
+export const isNetworkError = (error: Error): boolean => {
+  return (
+    error.message.includes("Network") ||
+    error.message.includes("timeout") ||
+    error.message.includes("connection")
+  );
+};
+
+/**
+ * Formats error message for user display
+ */
+export const formatApiError = (error: Error): string => {
+  if (isNetworkError(error)) {
+    return "Please check your internet connection and try again.";
+  }
+
+  if (error.message.includes("not found")) {
+    return "No results found. Try a different search term.";
+  }
+
+  if (error.message.includes("Too many")) {
+    return "Search returned too many results. Please be more specific.";
+  }
+
+  return "Something went wrong. Please try again later.";
+};
