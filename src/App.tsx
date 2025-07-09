@@ -1,4 +1,3 @@
-// src/App.tsx
 import React, { useState, useEffect } from "react";
 import "./index.css";
 import { SearchBar } from "./features/search/components/SearchBar";
@@ -16,7 +15,6 @@ function App() {
   const [currentView, setCurrentView] = useState<AppView>("search");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  // Search functionality
   const {
     movies,
     isLoading: isSearchLoading,
@@ -29,7 +27,6 @@ function App() {
     clearResults,
   } = useMovieSearch();
 
-  // Movie details functionality
   const {
     movieDetails,
     isLoading: isDetailsLoading,
@@ -38,7 +35,6 @@ function App() {
     clearDetails,
   } = useMovieDetails();
 
-  // Handle movie card click
   const handleMovieClick = async (movie: Movie) => {
     console.log("🎬 Movie clicked:", movie.Title);
     setSelectedMovie(movie);
@@ -46,7 +42,6 @@ function App() {
     await fetchMovieDetails(movie.imdbID);
   };
 
-  // Handle back to search
   const handleBackToSearch = () => {
     console.log("⬅️ Going back to search");
     setCurrentView("search");
@@ -54,7 +49,6 @@ function App() {
     clearDetails();
   };
 
-  // Handle search clear
   const handleClearSearch = () => {
     console.log("🧹 Clearing search");
     clearResults();
@@ -63,7 +57,6 @@ function App() {
     setCurrentView("search");
   };
 
-  // Handle retry for details
   const handleRetryDetails = () => {
     if (selectedMovie) {
       console.log("🔄 Retrying details for:", selectedMovie.Title);
@@ -71,7 +64,6 @@ function App() {
     }
   };
 
-  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && currentView === "details") {
@@ -84,37 +76,16 @@ function App() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [currentView]);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("🔍 Search state:", {
-      moviesCount: movies.length,
-      isLoading: isSearchLoading,
-      error: searchError,
-      searchTerm,
-    });
-  }, [movies, isSearchLoading, searchError, searchTerm]);
-
-  useEffect(() => {
-    console.log("🎭 Details state:", {
-      hasDetails: !!movieDetails,
-      isLoading: isDetailsLoading,
-      error: detailsError,
-    });
-  }, [movieDetails, isDetailsLoading, detailsError]);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
             Movie Search App
           </h1>
-          <p className="text-gray-600">Discover movies powered by OMDb API</p>
-
-          <div className="mt-2 text-xs text-gray-400">
-            Current View: {currentView} | Movies: {movies.length} | Selected:{" "}
-            {selectedMovie?.Title || "None"}
-          </div>
+          <p className="text-gray-600 text-sm md:text-base">
+            Discover movies powered by OMDb API
+          </p>
         </div>
 
         {currentView === "details" && selectedMovie && (
@@ -131,18 +102,21 @@ function App() {
           </div>
         )}
 
+        {/* Search View */}
         {currentView === "search" && (
           <>
+            {/* Search Bar */}
             <div className="mb-8">
               <SearchBar
                 value={searchTerm}
                 onChange={setSearchTerm}
                 onClear={handleClearSearch}
                 isLoading={isSearchLoading}
-                placeholder="Try searching for 'batman', 'avengers', or 'star wars'..."
+                placeholder="Search for movies, TV shows, and more..."
               />
             </div>
 
+            {/* Search Results */}
             <SearchResults
               movies={movies}
               isLoading={isSearchLoading}
@@ -155,6 +129,7 @@ function App() {
           </>
         )}
 
+        {/* Details View */}
         {currentView === "details" && (
           <>
             {isDetailsLoading && (
@@ -176,6 +151,7 @@ function App() {
               />
             )}
 
+            {/* Fallback if no movie details and not loading */}
             {!movieDetails &&
               !isDetailsLoading &&
               !detailsError &&
@@ -192,6 +168,7 @@ function App() {
           </>
         )}
 
+        {/* Quick test buttons (remove in production) */}
         <div className="fixed bottom-4 right-4 bg-white p-2 rounded shadow-lg text-xs space-y-1">
           <div className="font-bold">Quick Test:</div>
           <button

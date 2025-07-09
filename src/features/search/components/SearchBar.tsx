@@ -30,9 +30,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-md mx-auto">
+    <div className="w-full max-w-2xl mx-auto">
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <svg
             className="h-5 w-5 text-gray-400"
             fill="none"
@@ -47,21 +47,22 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </svg>
         </div>
 
+        {/* Input Field */}
         <input
           type="text"
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="input-field pr-12 !pl-10"
+          className="w-full !pl-12 pr-12 py-4 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all duration-200 hover:shadow-md"
           disabled={isLoading}
         />
 
-        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+        <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
           {isLoading ? (
-            <div className="animate-spin h-5 w-5 text-blue-500">
+            <div className="animate-spin h-6 w-6 text-blue-500">
               <svg
-                className="h-5 w-5"
+                className="h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24">
@@ -76,8 +77,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           ) : value ? (
             <button
               onClick={handleClearClick}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-              type="button">
+              className="p-1 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
+              type="button"
+              aria-label="Clear search">
               <svg
                 className="h-5 w-5"
                 fill="none"
@@ -95,9 +97,22 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </div>
       </div>
 
-      <p className="text-xs text-gray-500 mt-1 text-center">
-        Start typing to search for movies...
-      </p>
+      <div className="mt-3 text-center">
+        <p className="text-sm text-gray-500">
+          Try searching for popular movies like "Batman", "Avengers", or "Star
+          Wars"
+        </p>
+        <div className="flex flex-wrap justify-center gap-2 mt-2">
+          {["batman", "avengers", "star wars", "marvel"].map((suggestion) => (
+            <button
+              key={suggestion}
+              onClick={() => onChange(suggestion)}
+              className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors">
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
