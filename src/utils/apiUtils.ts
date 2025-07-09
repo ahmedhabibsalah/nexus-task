@@ -1,40 +1,25 @@
-// src/utils/apiUtils.ts
 import { API_CONFIG } from "./constants";
 
-/**
- * Validates search term before making API call
- */
 export const validateSearchTerm = (searchTerm: string): boolean => {
   return searchTerm.trim().length >= 2;
 };
 
-/**
- * Sanitizes search term for API call
- */
 export const sanitizeSearchTerm = (searchTerm: string): string => {
   return searchTerm.trim().replace(/[^\w\s-]/gi, "");
 };
 
-/**
- * Gets the full poster URL or returns default
- */
 export const getPosterUrl = (posterPath: string): string => {
   if (!posterPath || posterPath === "N/A") {
     return API_CONFIG.DEFAULT_POSTER;
   }
 
-  // If it's already a full URL, return as is
   if (posterPath.startsWith("http")) {
     return posterPath;
   }
 
-  // Otherwise, construct the full URL
   return `${API_CONFIG.POSTER_URL}/?apikey=${API_CONFIG.API_KEY}&i=${posterPath}`;
 };
 
-/**
- * Handles API rate limiting with exponential backoff
- */
 export const withRetry = async <T>(
   apiCall: () => Promise<T>,
   maxRetries: number = 3,
@@ -47,8 +32,6 @@ export const withRetry = async <T>(
       return await apiCall();
     } catch (error) {
       lastError = error as Error;
-
-      // Don't retry on client errors (4xx)
       if (
         lastError.message.includes("400") ||
         lastError.message.includes("401")
@@ -56,12 +39,10 @@ export const withRetry = async <T>(
         throw lastError;
       }
 
-      // If this was the last attempt, throw the error
       if (attempt === maxRetries) {
         throw lastError;
       }
 
-      // Calculate delay with exponential backoff
       const delay = baseDelay * Math.pow(2, attempt);
       console.log(
         `API call failed, retrying in ${delay}ms (attempt ${
@@ -69,7 +50,6 @@ export const withRetry = async <T>(
         }/${maxRetries})`
       );
 
-      // Wait before retrying
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
@@ -77,9 +57,6 @@ export const withRetry = async <T>(
   throw lastError!;
 };
 
-/**
- * Checks if error is network-related
- */
 export const isNetworkError = (error: Error): boolean => {
   return (
     error.message.includes("Network") ||
@@ -88,9 +65,6 @@ export const isNetworkError = (error: Error): boolean => {
   );
 };
 
-/**
- * Formats error message for user display
- */
 export const formatApiError = (error: Error): string => {
   if (isNetworkError(error)) {
     return "Please check your internet connection and try again.";

@@ -1,14 +1,9 @@
-// src/services/apiTest.ts
-// This file is for testing the API integration
-// You can remove it later or use it for debugging
-
 import omdbApi from "./omdbApi";
 
 export const testOMDbAPI = async () => {
   console.log("🔍 Testing OMDb API integration...");
 
   try {
-    // Test 1: Search for movies
     console.log('\n📋 Test 1: Searching for "batman" movies...');
     const searchResults = await omdbApi.searchMovies({ s: "batman" });
     console.log("✅ Search successful:", {
@@ -17,7 +12,6 @@ export const testOMDbAPI = async () => {
       firstMovie: searchResults.Search?.[0]?.Title || "None",
     });
 
-    // Test 2: Get movie details by ID
     if (searchResults.Search && searchResults.Search.length > 0) {
       const firstMovie = searchResults.Search[0];
       console.log("\n🎬 Test 2: Getting details for first movie...");
@@ -30,7 +24,6 @@ export const testOMDbAPI = async () => {
       });
     }
 
-    // Test 3: Error handling
     console.log("\n❌ Test 3: Testing error handling...");
     try {
       await omdbApi.searchMovies({ s: "xyz123impossiblemovietitle" });

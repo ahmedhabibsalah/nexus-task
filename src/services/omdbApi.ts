@@ -1,4 +1,3 @@
-// src/services/omdbApi.ts
 import apiClient from "./api";
 import { ERROR_MESSAGES } from "../utils/constants";
 import type {
@@ -9,15 +8,11 @@ import type {
 } from "../types/api";
 
 class OMDbApiService {
-  /**
-   * Search for movies by title
-   */
   async searchMovies(params: SearchParams): Promise<SearchResponse> {
     try {
       const response = await apiClient.get<SearchResponse>("/", {
         params: {
           ...params,
-          // Ensure we always have a search term
           s: params.s.trim(),
         },
       });
@@ -26,7 +21,6 @@ class OMDbApiService {
     } catch (error) {
       console.error("Search movies error:", error);
 
-      // Handle specific error cases
       if (error instanceof Error) {
         if (error.message.includes("Movie not found")) {
           throw new Error(ERROR_MESSAGES.NO_RESULTS);
@@ -40,9 +34,6 @@ class OMDbApiService {
     }
   }
 
-  /**
-   * Get detailed information about a specific movie
-   */
   async getMovieDetails(
     params: MovieDetailParams
   ): Promise<MovieDetailsResponse> {
@@ -50,7 +41,7 @@ class OMDbApiService {
       const response = await apiClient.get<MovieDetailsResponse>("/", {
         params: {
           ...params,
-          plot: params.plot || "short", // Default to short plot
+          plot: params.plot || "short",
         },
       });
 
@@ -66,23 +57,14 @@ class OMDbApiService {
     }
   }
 
-  /**
-   * Get movie details by IMDb ID
-   */
   async getMovieById(imdbId: string): Promise<MovieDetailsResponse> {
     return this.getMovieDetails({ i: imdbId });
   }
 
-  /**
-   * Get movie details by title
-   */
   async getMovieByTitle(title: string): Promise<MovieDetailsResponse> {
     return this.getMovieDetails({ t: title.trim() });
   }
 
-  /**
-   * Search with pagination support
-   */
   async searchMoviesWithPagination(
     searchTerm: string,
     page: number = 1,
@@ -96,6 +78,5 @@ class OMDbApiService {
   }
 }
 
-// Export a singleton instance
 export const omdbApi = new OMDbApiService();
 export default omdbApi;
