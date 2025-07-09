@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./index.css";
 import { SearchBar } from "./features/search/components/SearchBar";
 import { SearchResults } from "./features/search/components/SearchResults";
@@ -35,34 +35,37 @@ function App() {
     clearDetails,
   } = useMovieDetails();
 
-  const handleMovieClick = async (movie: Movie) => {
-    console.log("🎬 Movie clicked:", movie.Title);
-    setSelectedMovie(movie);
-    setCurrentView("details");
-    await fetchMovieDetails(movie.imdbID);
-  };
+  const handleMovieClick = useCallback(
+    async (movie: Movie) => {
+      console.log("🎬 Movie clicked:", movie.Title);
+      setSelectedMovie(movie);
+      setCurrentView("details");
+      await fetchMovieDetails(movie.imdbID);
+    },
+    [fetchMovieDetails]
+  );
 
-  const handleBackToSearch = () => {
+  const handleBackToSearch = useCallback(() => {
     console.log("⬅️ Going back to search");
     setCurrentView("search");
     setSelectedMovie(null);
     clearDetails();
-  };
+  }, [clearDetails]);
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     console.log("🧹 Clearing search");
     clearResults();
     setSelectedMovie(null);
     clearDetails();
     setCurrentView("search");
-  };
+  }, [clearResults, clearDetails]);
 
-  const handleRetryDetails = () => {
+  const handleRetryDetails = useCallback(() => {
     if (selectedMovie) {
       console.log("🔄 Retrying details for:", selectedMovie.Title);
       fetchMovieDetails(selectedMovie.imdbID);
     }
-  };
+  }, [selectedMovie, fetchMovieDetails]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -74,7 +77,7 @@ function App() {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [currentView]);
+  }, [currentView, handleBackToSearch]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -102,10 +105,8 @@ function App() {
           </div>
         )}
 
-        {/* Search View */}
         {currentView === "search" && (
           <>
-            {/* Search Bar */}
             <div className="mb-8">
               <SearchBar
                 value={searchTerm}
@@ -116,7 +117,6 @@ function App() {
               />
             </div>
 
-            {/* Search Results */}
             <SearchResults
               movies={movies}
               isLoading={isSearchLoading}
@@ -129,7 +129,6 @@ function App() {
           </>
         )}
 
-        {/* Details View */}
         {currentView === "details" && (
           <>
             {isDetailsLoading && (
@@ -151,7 +150,6 @@ function App() {
               />
             )}
 
-            {/* Fallback if no movie details and not loading */}
             {!movieDetails &&
               !isDetailsLoading &&
               !detailsError &&
@@ -168,7 +166,6 @@ function App() {
           </>
         )}
 
-        {/* Quick test buttons (remove in production) */}
         <div className="fixed bottom-4 right-4 bg-white p-2 rounded shadow-lg text-xs space-y-1">
           <div className="font-bold">Quick Test:</div>
           <button
