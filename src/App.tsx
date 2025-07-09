@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./index.css";
 import { SearchBar } from "./features/search/components/SearchBar";
 import { SearchResults } from "./features/search/components/SearchResults";
 import { MovieDetails } from "./features/movie-details/components/MovieDetails";
 import { LoadingSpinner } from "./components/ui/LoadingSpinner";
 import { ErrorMessage } from "./components/ui/ErrorMessage";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 import { useMovieSearch } from "./features/search/hooks/useMovieSearch";
 import { useMovieDetails } from "./features/movie-details/hooks/useMovieDetails";
+import { scrollToTop } from "./utils/apiUtils";
 import type { Movie } from "./types/movie";
 
 type AppView = "search" | "details";
@@ -37,10 +39,15 @@ function App() {
 
   const handleMovieClick = useCallback(
     async (movie: Movie) => {
-      console.log("🎬 Movie clicked:", movie.Title);
-      setSelectedMovie(movie);
-      setCurrentView("details");
-      await fetchMovieDetails(movie.imdbID);
+      try {
+        console.log("🎬 Movie clicked:", movie.Title);
+        setSelectedMovie(movie);
+        setCurrentView("details");
+        scrollToTop();
+        await fetchMovieDetails(movie.imdbID);
+      } catch (error) {
+        console.error("Error handling movie click:", error);
+      }
     },
     [fetchMovieDetails]
   );
@@ -50,6 +57,7 @@ function App() {
     setCurrentView("search");
     setSelectedMovie(null);
     clearDetails();
+    scrollToTop();
   }, [clearDetails]);
 
   const handleClearSearch = useCallback(() => {
@@ -59,7 +67,6 @@ function App() {
     clearDetails();
     setCurrentView("search");
   }, [clearResults, clearDetails]);
-
   const handleRetryDetails = useCallback(() => {
     if (selectedMovie) {
       console.log("🔄 Retrying details for:", selectedMovie.Title);
@@ -69,6 +76,10 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.target && (event.target as HTMLElement).tagName === "INPUT") {
+        return;
+      }
+
       if (event.key === "Escape" && currentView === "details") {
         console.log("⌨️ Escape pressed - going back");
         handleBackToSearch();
@@ -79,113 +90,138 @@ function App() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [currentView, handleBackToSearch]);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      if (currentView === "details") {
+        handleBackToSearch();
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [currentView, handleBackToSearch]);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-            Movie Search App
-          </h1>
-          <p className="text-gray-600 text-sm md:text-base">
-            Discover movies powered by OMDb API
-          </p>
-        </div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <header className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+              Movie Search App
+            </h1>
+            <p className="text-gray-600 text-sm md:text-base">
+              Discover movies powered by OMDb API
+            </p>
+          </header>
 
-        {currentView === "details" && selectedMovie && (
-          <div className="mb-6">
-            <nav className="flex items-center text-sm text-gray-500">
-              <button
-                onClick={handleBackToSearch}
-                className="hover:text-blue-600 transition-colors">
-                Search Results
-              </button>
-              <span className="mx-2">/</span>
-              <span className="text-gray-900">{selectedMovie.Title}</span>
+          {currentView === "details" && selectedMovie && (
+            <nav className="mb-6" aria-label="Breadcrumb">
+              <div className="flex items-center text-sm text-gray-500">
+                <button
+                  onClick={handleBackToSearch}
+                  className="hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1"
+                  aria-label="Go back to search results">
+                  Search Results
+                </button>
+                <span className="mx-2" aria-hidden="true">
+                  /
+                </span>
+                <span className="text-gray-900" aria-current="page">
+                  {selectedMovie.Title}
+                </span>
+              </div>
             </nav>
-          </div>
-        )}
+          )}
 
-        {currentView === "search" && (
-          <>
-            <div className="mb-8">
-              <SearchBar
-                value={searchTerm}
-                onChange={setSearchTerm}
-                onClear={handleClearSearch}
-                isLoading={isSearchLoading}
-                placeholder="Search for movies, TV shows, and more..."
-              />
-            </div>
-
-            <SearchResults
-              movies={movies}
-              isLoading={isSearchLoading}
-              error={searchError}
-              totalResults={totalResults}
-              hasMoreResults={hasMoreResults}
-              onMovieClick={handleMovieClick}
-              onLoadMore={loadNextPage}
-            />
-          </>
-        )}
-
-        {currentView === "details" && (
-          <>
-            {isDetailsLoading && (
-              <LoadingSpinner size="lg" message="Loading movie details..." />
-            )}
-
-            {detailsError && (
-              <ErrorMessage
-                message={detailsError}
-                onRetry={handleRetryDetails}
-              />
-            )}
-
-            {movieDetails && !isDetailsLoading && !detailsError && (
-              <MovieDetails
-                movieDetails={movieDetails}
-                onBack={handleBackToSearch}
-                isLoading={isDetailsLoading}
-              />
-            )}
-
-            {!movieDetails &&
-              !isDetailsLoading &&
-              !detailsError &&
-              selectedMovie && (
-                <div className="text-center py-12">
-                  <p className="text-gray-600 mb-4">
-                    No details available for {selectedMovie.Title}
-                  </p>
-                  <button onClick={handleBackToSearch} className="btn-primary">
-                    Back to Search
-                  </button>
+          <main>
+            {currentView === "search" && (
+              <>
+                <div className="mb-8">
+                  <SearchBar
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    onClear={handleClearSearch}
+                    isLoading={isSearchLoading}
+                    placeholder="Search for movies, TV shows, and more..."
+                  />
                 </div>
-              )}
-          </>
-        )}
 
-        <div className="fixed bottom-4 right-4 bg-white p-2 rounded shadow-lg text-xs space-y-1">
-          <div className="font-bold">Quick Test:</div>
-          <button
-            onClick={() => setSearchTerm("batman")}
-            className="block w-full text-left text-blue-600 hover:bg-blue-50 px-2 py-1 rounded">
-            Search "batman"
-          </button>
-          <button
-            onClick={() => setSearchTerm("avengers")}
-            className="block w-full text-left text-blue-600 hover:bg-blue-50 px-2 py-1 rounded">
-            Search "avengers"
-          </button>
-          <button
-            onClick={handleClearSearch}
-            className="block w-full text-left text-red-600 hover:bg-red-50 px-2 py-1 rounded">
-            Clear All
-          </button>
+                <SearchResults
+                  movies={movies}
+                  isLoading={isSearchLoading}
+                  error={searchError}
+                  totalResults={totalResults}
+                  hasMoreResults={hasMoreResults}
+                  onMovieClick={handleMovieClick}
+                  onLoadMore={loadNextPage}
+                />
+              </>
+            )}
+
+            {currentView === "details" && (
+              <>
+                {isDetailsLoading && (
+                  <LoadingSpinner
+                    size="lg"
+                    message="Loading movie details..."
+                  />
+                )}
+
+                {detailsError && (
+                  <ErrorMessage
+                    message={detailsError}
+                    onRetry={handleRetryDetails}
+                  />
+                )}
+
+                {movieDetails && !isDetailsLoading && !detailsError && (
+                  <MovieDetails
+                    movieDetails={movieDetails}
+                    onBack={handleBackToSearch}
+                    isLoading={isDetailsLoading}
+                  />
+                )}
+
+                {!movieDetails &&
+                  !isDetailsLoading &&
+                  !detailsError &&
+                  selectedMovie && (
+                    <div className="text-center py-12">
+                      <div className="max-w-md mx-auto">
+                        <div className="w-16 h-16 mx-auto mb-4 text-gray-400">
+                          <svg
+                            className="w-full h-full"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          Details Unavailable
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          We couldn't load details for "{selectedMovie.Title}"
+                        </p>
+                        <button
+                          onClick={handleBackToSearch}
+                          className="btn-primary">
+                          Back to Search Results
+                        </button>
+                      </div>
+                    </div>
+                  )}
+              </>
+            )}
+          </main>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
 

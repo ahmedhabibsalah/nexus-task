@@ -1,8 +1,8 @@
-export const throttle = <T extends (...args: any[]) => any>(
+export const throttle = <T extends (...args: unknown[]) => unknown>(
   func: T,
   delay: number
 ): ((...args: Parameters<T>) => void) => {
-  let timeoutId: NodeJS.Timeout | null = null;
+  let timeoutId: number | null = null;
   let lastExecTime = 0;
 
   return (...args: Parameters<T>) => {
@@ -16,7 +16,7 @@ export const throttle = <T extends (...args: any[]) => any>(
         clearTimeout(timeoutId);
       }
 
-      timeoutId = setTimeout(() => {
+      timeoutId = window.setTimeout(() => {
         func(...args);
         lastExecTime = Date.now();
       }, delay - (currentTime - lastExecTime));
@@ -138,7 +138,9 @@ export class LRUCache<K, V> {
       this.cache.delete(key);
     } else if (this.cache.size >= this.maxSize) {
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.cache.delete(firstKey);
+      }
     }
 
     this.cache.set(key, value);
