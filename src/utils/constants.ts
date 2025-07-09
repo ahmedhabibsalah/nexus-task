@@ -1,6 +1,6 @@
 export const API_CONFIG = {
-  BASE_URL: "http://www.omdbapi.com",
-  POSTER_URL: "http://img.omdbapi.com",
+  BASE_URL: "https://www.omdbapi.com",
+  POSTER_URL: "https://img.omdbapi.com",
   API_KEY: "8220c82",
   DEFAULT_POSTER: "/placeholder-movie.jpg",
 } as const;
