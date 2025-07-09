@@ -1,7 +1,7 @@
 export const API_CONFIG = {
   BASE_URL: "http://www.omdbapi.com",
   POSTER_URL: "http://img.omdbapi.com",
-  API_KEY: "9acc9025",
+  API_KEY: "8220c82",
   DEFAULT_POSTER: "/placeholder-movie.jpg",
 } as const;
 
@@ -18,4 +18,6 @@ export const ERROR_MESSAGES = {
   NO_RESULTS: "No movies found. Try a different search term.",
   INVALID_SEARCH: "Please enter at least 2 characters to search.",
   MOVIE_NOT_FOUND: "Movie details not found.",
+  INVALID_API_KEY:
+    "API key is not activated. Please check your email and activate your key.",
 } as const;

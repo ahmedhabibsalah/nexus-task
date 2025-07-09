@@ -91,7 +91,9 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie, onClick }) => {
           </span>
         </div>
 
-        <div className="mt-2 text-xs text-gray-500">IMDb: {movie.imdbID}</div>
+        <div className="mt-2 text-xs text-gray-500">
+          IMDb ID: {movie.imdbID}
+        </div>
       </div>
     </div>
   );

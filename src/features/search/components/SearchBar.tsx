@@ -53,7 +53,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="input-field pl-10 pr-12"
+          className="input-field pr-12 !pl-10"
           disabled={isLoading}
         />
 
