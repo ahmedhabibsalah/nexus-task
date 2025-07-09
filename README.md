@@ -1,4 +1,4 @@
-# 🎬 Movie Search App
+#  Movie Search App
 
 A modern, responsive React application for searching and discovering movies using the OMDb API.
 You Can Check The Live Demo from here: https://nexus-exercise.netlify.app/
@@ -148,7 +148,7 @@ src/
 - **Smart image loading** - Lazy loading with fallbacks
 - **Error recovery** - Retry mechanisms for failed requests
 
-## 🧪 Testing the App
+##  Testing the App
 
 ### **Basic Functionality**
 
@@ -176,7 +176,7 @@ Click movie → View details → Back button → Search again
 - **Tablet** (640-1024px): 2-3 column grid, efficient layout
 - **Desktop** (> 1024px): 4-5 column grid, full details layout
 
-## 🚀 Deployment
+##  Deployment
 
 ### **Build for Production**
 
@@ -206,7 +206,7 @@ For production deployment, consider using environment variables:
 VITE_OMDB_API_KEY=your_api_key_here
 ```
 
-## 🔧 Customization
+##  Customization
 
 ### **Styling**
 
@@ -257,7 +257,7 @@ Solution: Check console for network timing and cache hit rates
 - **Performance logs** - Check console for timing information
 - **Network tab** - Monitor API calls and caching behavior
 
-## 📈 Performance Metrics
+##  Performance Metrics
 
 ### **Target Performance**
 
