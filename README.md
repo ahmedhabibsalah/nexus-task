@@ -1,8 +1,11 @@
 # 🎬 Movie Search App
 
 A modern, responsive React application for searching and discovering movies using the OMDb API.
+You Can Check The Live Demo from here: https://nexus-exercise.netlify.app/
 
-![Movie Search App](https://via.placeholder.com/800x400/667eea/ffffff?text=Movie+Search+App)
+![Movie Search App]
+![Uploading screencapture-localhost-5173-2025-07-09-19_12_49.png…]()
+
 
 ## ✨ Features
 
