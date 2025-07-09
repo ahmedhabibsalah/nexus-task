@@ -4,7 +4,8 @@ A modern, responsive React application for searching and discovering movies usin
 You Can Check The Live Demo from here: https://nexus-exercise.netlify.app/
 
 ![Movie Search App]
-![Uploading screencapture-localhost-5173-2025-07-09-19_12_49.png…]()
+
+![image](https://github.com/user-attachments/assets/d6c1e58f-055e-4fcc-a370-92bfc40a730b)
 
 
 ## ✨ Features
