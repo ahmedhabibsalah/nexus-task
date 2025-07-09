@@ -8,37 +8,37 @@ You Can Check The Live Demo from here: https://nexus-exercise.netlify.app/
 ![image](https://github.com/user-attachments/assets/d6c1e58f-055e-4fcc-a370-92bfc40a730b)
 
 
-## ✨ Features
+##  Features
 
-### 🔍 **Smart Search**
+###  **Smart Search**
 
 - **Debounced search** with 300ms delay for optimal performance
 - **Real-time results** as you type
 - **Intelligent caching** to avoid duplicate API calls
 - **Search suggestions** with quick-start buttons
 
-### 🎭 **Movie Details**
+###  **Movie Details**
 
 - **Comprehensive information** including plot, cast, ratings, and more
 - **High-quality posters** with graceful fallbacks
 - **IMDb integration** with direct links
 - **Responsive layout** for all screen sizes
 
-### 🚀 **Performance Optimized**
+###  **Performance Optimized**
 
 - **React optimizations** with memo, useCallback, and useMemo
 - **Lazy loading** for images and components
 - **LRU cache** for efficient memory management
 - **Performance monitoring** and error tracking
 
-### ♿ **Accessible & User-Friendly**
+###  **Accessible & User-Friendly**
 
 - **Full keyboard navigation** support
 - **Screen reader compatibility** with proper ARIA labels
 - **Error boundaries** for graceful error handling
 - **Responsive design** for mobile, tablet, and desktop
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -80,7 +80,7 @@ You Can Check The Live Demo from here: https://nexus-exercise.netlify.app/
 5. **Open your browser**
    Navigate to `http://localhost:5173`
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 ### **Frontend**
 
@@ -102,7 +102,7 @@ You Can Check The Live Demo from here: https://nexus-exercise.netlify.app/
 - **Axios** - HTTP client with interceptors and error handling
 - **Smart caching** - 5-minute cache with automatic cleanup
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 src/
@@ -125,7 +125,7 @@ src/
 └── App.tsx             # Main application component
 ```
 
-## 🎯 Key Features Walkthrough
+##  Key Features Walkthrough
 
 ### **Search Experience**
 
@@ -226,7 +226,7 @@ VITE_OMDB_API_KEY=your_api_key_here
 - Extend movie details in `MovieDetails.tsx`
 - Implement additional views following the feature-based structure
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### **Common Issues**
 
